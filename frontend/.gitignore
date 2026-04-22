@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Project specific
+backend/.env
+backend/static/
+backend/uploads/
+
+# Node modules
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Android
+.gradle/
+build/
+*.iml
+.idea/
+local.properties
+.DS_Store
+
+# Images/Dataset
+dataset/*
+!dataset/.gitkeep
