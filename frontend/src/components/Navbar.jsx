@@ -1,56 +1,90 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Leaf, FlaskConical, Factory, QrCode } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useMockData } from '../context/MockDataContext';
+import { FlaskConical, Factory, LogOut, Leaf } from 'lucide-react';
 
-function Navbar() {
+export default function Navbar() {
+  const { auth, logout } = useMockData();
+  const navigate = useNavigate();
   const location = useLocation();
-  
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bg-white border-b border-green-100 shadow-sm sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-botanical-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="bg-green-600 p-2 rounded-lg">
-                <Leaf className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-green-800 tracking-tight">VanSetu</span>
-            </Link>
+        <div className="flex justify-between h-16 items-center">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="bg-botanical-700 p-2 rounded-xl group-hover:bg-botanical-600 transition-colors">
+              <Leaf className="h-5 w-5 text-white" />
+            </div>
+            <span className="font-display text-xl font-bold text-botanical-800 tracking-tight">
+              VanaSetu
+            </span>
+          </Link>
+
+          {/* Center Nav */}
+          <div className="flex items-center gap-1">
+            {auth.role === 'lab' && (
+              <Link
+                to="/lab"
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200 ${
+                  isActive('/lab')
+                    ? 'bg-botanical-100 text-botanical-700'
+                    : 'text-gray-500 hover:text-botanical-600 hover:bg-botanical-50'
+                }`}
+              >
+                <FlaskConical className="h-4 w-4" />
+                Lab Portal
+              </Link>
+            )}
+            {auth.role === 'manufacturer' && (
+              <Link
+                to="/manufacturer"
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200 ${
+                  isActive('/manufacturer')
+                    ? 'bg-botanical-100 text-botanical-700'
+                    : 'text-gray-500 hover:text-botanical-600 hover:bg-botanical-50'
+                }`}
+              >
+                <Factory className="h-4 w-4" />
+                Manufacturer
+              </Link>
+            )}
           </div>
-          <div className="flex items-center space-x-4">
-            <Link 
-              to="/lab-portal" 
-              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/lab-portal') ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-              }`}
-            >
-              <FlaskConical className="h-4 w-4" />
-              <span>Lab Portal</span>
-            </Link>
-            <Link 
-              to="/manufacturer" 
-              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/manufacturer') ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-              }`}
-            >
-              <Factory className="h-4 w-4" />
-              <span>Manufacturer</span>
-            </Link>
-            <Link 
-              to="/scan" 
-              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/scan') ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-              }`}
-            >
-              <QrCode className="h-4 w-4" />
-              <span>Scan QR</span>
-            </Link>
+
+          {/* Right Side */}
+          <div className="flex items-center gap-4">
+            {auth.isLoggedIn && (
+              <>
+                <div className="hidden sm:flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-botanical-100 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-botanical-700">
+                      {auth.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="text-sm">
+                    <p className="font-semibold text-gray-800 font-body leading-tight">{auth.username}</p>
+                    <p className="text-xs text-gray-400 font-body capitalize">{auth.role === 'lab' ? 'Lab Technician' : 'Manufacturer'}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-body font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
     </nav>
   );
 }
-
-export default Navbar;
