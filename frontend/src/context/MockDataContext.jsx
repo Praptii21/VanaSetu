@@ -193,6 +193,21 @@ export function MockDataProvider({ children }) {
       expiry_date: productData.expiry_date,
       product_hash: productHash,
       trust_score: trustScore,
+      lab_location: {
+        lat: 13.0827,
+        lng: 80.2707,
+        name: 'Chennai, Tamil Nadu',
+      },
+      manufacturer_location: {
+        lat: 13.6288,
+        lng: 79.4192,
+        name: 'Tirupati, Andhra Pradesh',
+      },
+      destination_location: {
+        lat: 12.9716,
+        lng: 77.5946,
+        name: 'Bengaluru, Karnataka',
+      },
     };
 
     setProducts((prev) => [...prev, newProduct]);
