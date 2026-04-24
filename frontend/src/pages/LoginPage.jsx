@@ -33,13 +33,21 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username || !password) {
+      alert("Please enter both username and password");
+      return;
+    }
+    
     setIsLoading(true);
 
-    // Simulate auth delay for UX
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    login(role, username || 'Demo User');
-    navigate(redirectPath);
+    const result = await login(role, username, password);
+    
+    if (result.success) {
+      navigate(redirectPath);
+    } else {
+      alert(result.message);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -133,10 +141,18 @@ export default function LoginPage() {
           </form>
 
           {/* Demo notice */}
-          <div className="mt-6 pt-5 border-t border-gray-100 text-center">
+          <div className="mt-6 pt-5 border-t border-gray-100 text-center space-y-4">
+            <p className="font-body text-sm text-gray-500">
+              Don't have an account?{' '}
+              <button 
+                onClick={() => navigate('/signup')}
+                className="font-semibold text-botanical-600 hover:text-botanical-700 transition-colors"
+              >
+                Sign Up
+              </button>
+            </p>
             <p className="font-body text-xs text-gray-400 leading-relaxed">
-              🌿 <span className="font-medium text-botanical-500">Demo Mode</span> — Enter any credentials to proceed.
-              <br />No real authentication is performed.
+              🌿 <span className="font-medium text-botanical-500">Secure Mode</span> — Please use your registered credentials.
             </p>
           </div>
         </motion.div>

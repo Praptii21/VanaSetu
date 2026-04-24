@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useMockData } from './context/MockDataContext';
 import Landing from './pages/Landing';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import LabPortal from './pages/LabPortal';
 import ManufacturerDashboard from './pages/ManufacturerDashboard';
 import ConsumerScan from './pages/ConsumerScan';
@@ -30,6 +31,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login/:role" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
       <Route
         path="/lab"
         element={

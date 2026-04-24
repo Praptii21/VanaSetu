@@ -112,14 +112,30 @@ def create_product(
     db.commit()
     db.refresh(product)
 
+    # Return the full product details for the frontend (especially for PDF generation)
+    ingredients = []
+    for b in batches:
+        b_dict = {c.name: getattr(b, c.name) for c in b.__table__.columns}
+        if b.lab_report:
+            b_dict["lab_report"] = {c.name: getattr(b.lab_report, c.name) for c in b.lab_report.__table__.columns}
+        ingredients.append(b_dict)
+
+    result = {
+        "id": product.id,
+        "product_name": product.product_name,
+        "trust_score": product.trust_score,
+        "qr_data": qr_base64,
+        "product_hash": product_hash,
+        "manufacturing_date": product.manufacturing_date,
+        "expiry_date": product.expiry_date,
+        "total_input_weight": product.total_input_weight,
+        "output_units": product.output_units,
+        "ingredients": ingredients
+    }
+
     return {
         "success": True,
-        "data": {
-            "product_id": product.id,
-            "trust_score": trust_score,
-            "qr_base64": qr_base64,
-            "product_hash": product_hash,
-        }
+        "data": result
     }
 
 

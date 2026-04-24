@@ -52,12 +52,27 @@ export default function Landing() {
       <LeafSVG className="absolute top-[60%] left-[5%] w-8 h-12 text-botanical-300/10 animate-float-medium pointer-events-none rotate-[-30deg]" />
 
       {/* ── Top Bar ─────────────────────────────── */}
-      <div className="relative z-10 flex items-center justify-between px-8 py-5">
+      <div className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-2.5">
-          <div className="bg-botanical-700 p-2 rounded-xl">
+          <div className="bg-botanical-700 p-2.5 rounded-xl shadow-lg shadow-botanical-200">
             <Leaf className="h-5 w-5 text-white" />
           </div>
-          <span className="font-display text-xl font-bold text-botanical-800">VanaSetu</span>
+          <span className="font-display text-2xl font-bold text-botanical-800 tracking-tight">VanaSetu</span>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate('/login/lab')} 
+            className="font-body text-sm font-semibold text-gray-600 hover:text-botanical-700 transition-colors"
+          >
+            Sign In
+          </button>
+          <button 
+            onClick={() => navigate('/signup')} 
+            className="btn-primary py-2.5 px-6 text-sm"
+          >
+            Sign Up Free
+          </button>
         </div>
       </div>
 

@@ -27,17 +27,24 @@ export default function ConsumerScan() {
   const [inputCode, setInputCode] = useState('');
   const [error, setError] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    if (productId) {
-      const found = getProduct(productId);
-      if (found) {
-        setProduct(found);
-        setError('');
-      } else {
-        setError('Product not found. Please check the ID and try again.');
-        setProduct(null);
+    const fetchProduct = async () => {
+      if (productId) {
+        setLoading(true);
+        const found = await getProduct(productId);
+        if (found) {
+          setProduct(found);
+          setError('');
+        } else {
+          setError('Product not found. Please check the ID and try again.');
+          setProduct(null);
+        }
+        setLoading(false);
       }
-    }
+    };
+    fetchProduct();
   }, [productId, getProduct]);
 
   const handleSearch = (e) => {
@@ -266,7 +273,7 @@ export default function ConsumerScan() {
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={() => {
-              const doc = generatePDF(product, null);
+              const doc = generatePDF(product, product.qr_data);
               doc.save('VanaSetu-Report-' + product.product_name.replace(/\s+/g, '-') + '.pdf');
             }}
             className="btn-primary flex items-center gap-2"
