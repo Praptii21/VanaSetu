@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">वनसेतु</string>
+    <string name="camera_btn">📸 कैमरा खोलें</string>
+    <string name="herb_detected">जड़ी बूटी: %1$s</string>
+    <string name="confidence">सटीकता: %1$.2f%%</string>
+    <string name="collector_name_hint">संग्रहकर्ता का नाम</string>
+    <string name="weight_hint">वजन (किग्रा)</string>
+    <string name="notes_hint">अतिरिक्त नोट्स (वैकल्पिक)</string>
+    <string name="gps_label">📍 स्थान: %1$s</string>
+    <string name="time_label">⏰ समय: %1$s</string>
+    <string name="submit_btn">🚀 सबमिट करें</string>
+    <string name="success_title">सफलतापूर्वक सबमिट किया गया ✅</string>
+    <string name="success_subtext">आपके योगदान के लिए धन्यवाद 🌿</string>
+    <string name="lang_toggle">EN | हिंदी</string>
+    <string name="validation_error">कृपया सभी आवश्यक फ़ील्ड भरें</string>
+    <string name="pending">प्रतीक्षा करें...</string>
+</resources>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">VanaSetu</string>
+    <string name="camera_btn">📸 Open Camera</string>
+    <string name="herb_detected">Herb Detected: %1$s</string>
+    <string name="confidence">Confidence: %1$.2f%%</string>
+    <string name="collector_name_hint">Collector Name</string>
+    <string name="weight_hint">Weight (kg)</string>
+    <string name="notes_hint">Additional Notes (Optional)</string>
+    <string name="gps_label">📍 GPS: %1$s</string>
+    <string name="time_label">⏰ Time: %1$s</string>
+    <string name="submit_btn">🚀 Submit Harvest</string>
+    <string name="success_title">Submission Received Successfully ✅</string>
+    <string name="success_subtext">Thank you for your contribution 🌿</string>
+    <string name="lang_toggle">EN | हिंदी</string>
+    <string name="validation_error">Please fill all required fields</string>
+    <string name="pending">Pending...</string>
+</resources>

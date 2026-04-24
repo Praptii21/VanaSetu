@@ -1,0 +1,10 @@
+<resources>
+    <!-- Base application theme -->
+    <style name="Base.Theme.VanaSetu" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here -->
+        <item name="colorPrimary">#2E7D32</item>
+        <item name="colorSecondary">#4CAF50</item>
+    </style>
+
+    <style name="Theme.VanaSetu" parent="Base.Theme.VanaSetu" />
+</resources>
