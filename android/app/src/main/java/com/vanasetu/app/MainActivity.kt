@@ -29,6 +29,11 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import java.util.*
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tflite: Interpreter
     private lateinit var labels: List<String>
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var apiService: ApiService
 
     private var currentHerb: String = ""
     private var currentConfidence: Float = 0f
@@ -99,6 +105,13 @@ class MainActivity : AppCompatActivity() {
         val btnCapture = findViewById<MaterialButton>(R.id.btnCapture)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // Initialize Retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://192.168.137.196:8000") // Connect to backend on the local network
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        apiService = retrofit.create(ApiService::class.java)
 
         try {
             initTFLite()
@@ -252,14 +265,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun submitHarvest() {
+        val name = etCollectorName.text?.toString() ?: ""
+        val weight = etWeight.text?.toString() ?: 0.0f
+        val weightFloat = try { weight.toString().toFloat() } catch(e: Exception) { 0.0f }
+
+        val request = HarvestRequest(
+            herb_name = currentHerb,
+            collector_name = name,
+            weight_kg = weightFloat,
+            gps_lat = currentLat,
+            gps_lng = currentLon,
+            gps_place_name = tvLocation.text.toString().replace("GPS: ", ""),
+            ai_confidence = currentConfidence
+        )
+
+        // Disable UI
+        btnSubmit.isEnabled = false
+        
+        apiService.submitHarvest(request).enqueue(object : Callback<HarvestResponse> {
+            override fun onResponse(call: Call<HarvestResponse>, response: Response<HarvestResponse>) {
+                if (response.isSuccessful && response.body()?.success == true) {
+                    showSuccess()
+                } else {
+                    btnSubmit.isEnabled = true
+                    Toast.makeText(this@MainActivity, "Error: ${response.message()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<HarvestResponse>, t: Throwable) {
+                btnSubmit.isEnabled = true
+                Toast.makeText(this@MainActivity, "Network Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun showSuccess() {
         // Show success popup with animation
         successPopup.visibility = View.VISIBLE
         successPopup.alpha = 0f
         successPopup.animate().alpha(1f).setDuration(300).start()
 
-        // Disable UI
-        btnSubmit.isEnabled = false
-        
         // Hide after 2 seconds
         successPopup.postDelayed({
             successPopup.animate().alpha(0f).setDuration(300).withEndAction {

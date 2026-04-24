@@ -1,8 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useMockData } from './context/MockDataContext';
 import Landing from './pages/Landing';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
 import LabPortal from './pages/LabPortal';
 import ManufacturerDashboard from './pages/ManufacturerDashboard';
 import ConsumerScan from './pages/ConsumerScan';
@@ -13,7 +11,7 @@ function PortalLayout({ children, requiredRole }) {
   const { auth } = useMockData();
 
   if (!auth.isLoggedIn || auth.role !== requiredRole) {
-    return <Navigate to={`/login/${requiredRole}`} replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (
@@ -29,9 +27,9 @@ function PortalLayout({ children, requiredRole }) {
 export default function App() {
   return (
     <Routes>
+      {/* Single landing page — auth handled via modal */}
       <Route path="/" element={<Landing />} />
-      <Route path="/login/:role" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+
       <Route
         path="/lab"
         element={
@@ -48,7 +46,22 @@ export default function App() {
           </PortalLayout>
         }
       />
+      <Route
+        path="/collector"
+        element={
+          <PortalLayout requiredRole="collector">
+            <div className="p-8 text-center">
+              <h2 className="text-2xl font-bold">Collector Portal</h2>
+              <p className="text-gray-500">Please use the Android mobile app for harvesting data.</p>
+            </div>
+          </PortalLayout>
+        }
+      />
       <Route path="/product/:productId" element={<ConsumerScan />} />
+
+      {/* Redirect old standalone auth routes back to landing */}
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/signup" element={<Navigate to="/" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

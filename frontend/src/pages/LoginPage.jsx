@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FlaskConical, Factory, Leaf, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Leaf, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useMockData } from '../context/MockDataContext';
 
 export default function LoginPage() {
-  const { role } = useParams();
   const navigate = useNavigate();
   const { login, auth } = useMockData();
   const [username, setUsername] = useState('');
@@ -13,23 +12,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // If already logged in with correct role, redirect
-  if (auth.isLoggedIn && auth.role === role) {
-    return <Navigate to={`/${role}`} replace />;
+  // If already logged in, redirect to their role page
+  if (auth.isLoggedIn && auth.role) {
+    return <Navigate to={`/${auth.role}`} replace />;
   }
-
-  // Validate role
-  if (role !== 'lab' && role !== 'manufacturer') {
-    return <Navigate to="/" replace />;
-  }
-
-  const isLab = role === 'lab';
-  const Icon = isLab ? FlaskConical : Factory;
-  const title = isLab ? 'Lab Researcher' : 'Manufacturer';
-  const subtitle = isLab
-    ? 'Access the lab portal to verify herbal batches'
-    : 'Access the dashboard to create products';
-  const redirectPath = isLab ? '/lab' : '/manufacturer';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,10 +26,11 @@ export default function LoginPage() {
     
     setIsLoading(true);
 
-    const result = await login(role, username, password);
+    // Backend returns the correct role based on email
+    const result = await login('', username, password);
     
     if (result.success) {
-      navigate(redirectPath);
+      navigate(`/${result.role}`);
     } else {
       alert(result.message);
     }
@@ -77,21 +64,21 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-botanical-100 mb-4">
-              <Icon className="h-8 w-8 text-botanical-700" />
+              <Leaf className="h-8 w-8 text-botanical-700" />
             </div>
-            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">{title}</h1>
-            <p className="font-body text-sm text-gray-500">{subtitle}</p>
+            <h1 className="font-display text-3xl font-bold text-gray-900 mb-1">Sign In</h1>
+            <p className="font-body text-sm text-gray-500">Access your VanaSetu portal</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block font-body text-sm font-medium text-gray-700 mb-1.5">
-                Username
+                Email Address
               </label>
               <input
-                type="text"
-                placeholder={isLab ? 'Dr. Ananya Rao' : 'Priya Manufacturer'}
+                type="email"
+                placeholder="Enter your email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="input-botanical"

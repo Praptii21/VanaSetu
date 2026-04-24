@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FlaskConical, Factory, ArrowRight, Leaf, ShieldCheck, Truck, QrCode } from 'lucide-react';
+import AuthModal from '../components/AuthModal';
 
 // ── Decorative Leaf SVG ──────────────────────────────────
 function LeafSVG({ className }) {
@@ -40,10 +41,24 @@ function StepCard({ icon: Icon, title, description, step, delay }) {
 }
 
 export default function Landing() {
-  const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ mode: 'signup', role: 'collector' });
+
+  const openAuth = (mode, role = 'collector') => {
+    setModalConfig({ mode, role });
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* ── Auth Modal ─────────────────────────── */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={modalConfig.mode}
+        initialRole={modalConfig.role}
+      />
+
       {/* ── Floating Leaf Decorations ────────────── */}
       <LeafSVG className="absolute top-20 left-[8%] w-12 h-18 text-botanical-300/20 animate-float-slow pointer-events-none" />
       <LeafSVG className="absolute top-40 right-[10%] w-16 h-24 text-botanical-400/15 animate-float-medium pointer-events-none rotate-[25deg]" />
@@ -62,13 +77,15 @@ export default function Landing() {
         
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => navigate('/login/lab')} 
+            type="button"
+            onClick={() => openAuth('login')} 
             className="font-body text-sm font-semibold text-gray-600 hover:text-botanical-700 transition-colors"
           >
             Sign In
           </button>
           <button 
-            onClick={() => navigate('/signup')} 
+            type="button"
+            onClick={() => openAuth('signup')} 
             className="btn-primary py-2.5 px-6 text-sm"
           >
             Sign Up Free
@@ -169,9 +186,10 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 gap-6 mt-6">
             {/* Lab Researcher Card */}
             <motion.button
+              type="button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/login/lab')}
+              onClick={() => openAuth('login', 'lab')}
               className="botanical-card group relative p-8 text-left overflow-hidden"
             >
               {/* Decorative background */}
@@ -196,9 +214,10 @@ export default function Landing() {
 
             {/* Manufacturer Card */}
             <motion.button
+              type="button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/login/manufacturer')}
+              onClick={() => openAuth('login', 'manufacturer')}
               className="botanical-card group relative p-8 text-left overflow-hidden"
             >
               {/* Decorative background */}

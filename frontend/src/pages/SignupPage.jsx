@@ -189,7 +189,7 @@ export default function SignupPage() {
             <p className="font-body text-sm text-gray-500">
               Already have an account?{' '}
               <Link
-                to="/login/lab"
+                to="/login"
                 className="font-semibold text-botanical-600 hover:text-botanical-700 transition-colors"
               >
                 Sign In

@@ -30,7 +30,35 @@ class UserOut(BaseModel):
     class Config:
         from_attributes = True
 
+# ── FRAUD DETECTION ────────────────────────────────────────────────────────
+class FraudAlert(BaseModel):
+    type: str
+    reason: str
+    fraud_probability: int
+    action: Optional[str] = None
+
+class FraudDetectionResult(BaseModel):
+    alert_level: str  # GREEN, YELLOW, RED
+    trust_score: int
+    fraud_probability: int
+    status: str       # pending, flagged, rejected
+    message: str
+    alerts: List[FraudAlert]
+
 # ── COLLECTOR ────────────────────────────────────────────────────────────────
+
+class HarvestSubmitRequest(BaseModel):
+    herb_name: str
+    collector_name: str
+    weight_kg: float
+    gps_lat: float
+    gps_lng: float
+    ai_confidence: float
+    collected_at: datetime
+
+class HarvestSubmitResponse(BaseModel):
+    success: bool
+    data: dict
 
 class HarvestSubmit(BaseModel):
     herb_name: str

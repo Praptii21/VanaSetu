@@ -27,6 +27,14 @@ class Batch(Base):
     time_of_collection = Column(DateTime)
     status = Column(String, default="pending") # pending, lab verified, with manufacturer
     tx_hash = Column(String)
+    
+    # AI Fraud Detection Results
+    alert_level = Column(String, default="GREEN") # GREEN, YELLOW, RED
+    fraud_alerts = Column(JSON, default=[]) # Store list of alerts
+    fraud_probability = Column(Integer, default=0)
+    trust_score = Column(Integer, default=94)
+    ai_status = Column(String, default="pending") # pending, flagged, rejected
+    
     created_at = Column(DateTime, default=datetime.utcnow)
 
     lab_report = relationship("LabReport", back_populates="batch", uselist=False)

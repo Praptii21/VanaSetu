@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FlaskConical, X, AlertTriangle, CheckCircle, Scale, Clock, MapPin } from 'lucide-react';
+import { FlaskConical, X, AlertTriangle, CheckCircle, Scale, MapPin } from 'lucide-react';
 import { useMockData } from '../context/MockDataContext';
 
 // ── Toggle Switch Component ──────────────────────────────
@@ -60,65 +60,113 @@ export default function LabPortal() {
                 <th>Batch</th>
                 <th>Herb</th>
                 <th>Collector</th>
-                <th>Weight Sent</th>
+                <th>Weight</th>
+                <th>Score</th>
                 <th>Location</th>
-                <th>Time</th>
+                <th>Risk</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {pendingBatches.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-12 text-gray-400 font-body">
+                  <td colSpan="8" className="text-center py-12 text-gray-400 font-body">
                     <FlaskConical className="h-12 w-12 mx-auto mb-3 text-gray-200" />
                     <p className="text-lg font-medium text-gray-300">All caught up!</p>
                     <p className="text-sm">No pending batches to test</p>
                   </td>
                 </tr>
               ) : (
-                pendingBatches.map((batch, idx) => (
-                  <motion.tr
-                    key={batch.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                  >
-                    <td className="font-semibold text-gray-900 font-body">#{batch.id}</td>
-                    <td>
-                      <span className="inline-flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-botanical-400" />
-                        <span className="font-medium text-gray-800">{batch.herb_name}</span>
-                      </span>
-                    </td>
-                    <td className="text-gray-600">{batch.collector_name}</td>
-                    <td className="text-gray-800 font-medium">{batch.weight_kg} kg</td>
-                    <td>
-                      <span className="flex items-center gap-1 text-gray-500 text-xs">
-                        <MapPin className="h-3 w-3" />
-                        {batch.gps_place_name}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="flex items-center gap-1 text-gray-500 text-xs">
-                        <Clock className="h-3 w-3" />
-                        {new Date(batch.time_of_collection).toLocaleTimeString('en-IN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: true,
-                        })}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => setSelectedBatch(batch)}
-                        className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5"
-                      >
-                        <FlaskConical className="h-3.5 w-3.5" />
-                        Test
-                      </button>
-                    </td>
-                  </motion.tr>
-                ))
+                pendingBatches.map((batch, idx) => {
+                  const alertColors = {
+                    GREEN: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    YELLOW: 'bg-amber-50 text-amber-700 border-amber-200',
+                    RED: 'bg-red-50 text-red-700 border-red-200',
+                  };
+                  const alertDot = {
+                    GREEN: 'bg-emerald-500',
+                    YELLOW: 'bg-amber-500',
+                    RED: 'bg-red-500',
+                  };
+                  const fraudTagColors = {
+                    weight: 'bg-orange-100 text-orange-700',
+                    score: 'bg-purple-100 text-purple-700',
+                    location: 'bg-blue-100 text-blue-700',
+                    seasonal: 'bg-teal-100 text-teal-700',
+                  };
+                  const fraudAlerts = batch.fraud_alerts || [];
+                  const level = batch.alert_level || 'GREEN';
+
+                  return (
+                    <motion.tr
+                      key={batch.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className={level === 'RED' ? 'bg-red-50/40' : ''}
+                    >
+                      <td className="font-semibold text-gray-900 font-body">#{batch.id}</td>
+                      <td>
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className={`w-2 h-2 rounded-full ${alertDot[level]}`} />
+                          <span className="font-medium text-gray-800">{batch.herb_name}</span>
+                        </span>
+                      </td>
+                      <td className="text-gray-600">{batch.collector_name}</td>
+                      <td className="text-gray-800 font-medium">{batch.weight_kg} kg</td>
+                      <td>
+                        <span className={`font-bold text-sm ${
+                          batch.trust_score >= 80 ? 'text-emerald-600'
+                          : batch.trust_score >= 60 ? 'text-amber-600'
+                          : 'text-red-600'
+                        }`}>
+                          {batch.trust_score}%
+                        </span>
+                      </td>
+                      <td>
+                        <span className="flex items-center gap-1 text-gray-500 text-xs">
+                          <MapPin className="h-3 w-3" />
+                          {batch.gps_place_name}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex flex-col gap-1.5">
+                          {/* Alert level badge */}
+                          <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${alertColors[level]}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${alertDot[level]}`} />
+                            {level}
+                          </span>
+                          {/* Fraud reason tags */}
+                          {fraudAlerts.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {fraudAlerts.map((alert, i) => (
+                                <span
+                                  key={i}
+                                  title={alert.reason}
+                                  className={`text-[9px] font-semibold px-2 py-0.5 rounded-full cursor-default ${fraudTagColors[alert.type] || 'bg-gray-100 text-gray-600'}`}
+                                >
+                                  {alert.type === 'weight' && '⚖️ Weight'}
+                                  {alert.type === 'score' && '📉 Score'}
+                                  {alert.type === 'location' && '📍 Location'}
+                                  {alert.type === 'seasonal' && '🍂 Season'}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => setSelectedBatch(batch)}
+                          className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5"
+                        >
+                          <FlaskConical className="h-3.5 w-3.5" />
+                          Test
+                        </button>
+                      </td>
+                    </motion.tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -153,7 +201,22 @@ function LabReportModal({ batch, onClose, onSubmit }) {
   const [result, setResult] = useState(null);
 
   const weightDiff = Math.abs(batch.weight_kg - formData.weight_verified_kg);
-  const hasWeightMismatch = weightDiff > 0.01;
+  // Backend considers > 0.5kg as a mismatch
+  const hasWeightMismatch = weightDiff > 0.5;
+
+  // Auto-fail the batch if weight is mismatched, tests fail, or it came with a RED alert
+  useEffect(() => {
+    const shouldFail = 
+      hasWeightMismatch || 
+      !formData.heavy_metals_pass || 
+      !formData.contamination_pass || 
+      batch.alert_level === 'RED';
+      
+    setFormData(prev => ({
+      ...prev,
+      overall_status: shouldFail ? 'fail' : 'pass'
+    }));
+  }, [hasWeightMismatch, formData.heavy_metals_pass, formData.contamination_pass, batch.alert_level]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -162,15 +225,15 @@ function LabReportModal({ batch, onClose, onSubmit }) {
     const res = await onSubmit(batch.id, formData);
     setResult(res);
     setSubmitting(false);
-
-    // Auto-close after showing result
-    setTimeout(() => {
-      onClose();
-    }, 2000);
   };
 
   // Success view
   if (result) {
+    const statusColor = result.overall_status === 'pass' || formData.overall_status === 'pass'
+      ? 'text-botanical-600 bg-botanical-50'
+      : 'text-red-600 bg-red-50';
+    const overallLabel = (result.overall_status || formData.overall_status) === 'pass' ? '✅ Pass' : '❌ Fail';
+
     return (
       <div className="modal-overlay" onClick={onClose}>
         <motion.div
@@ -178,25 +241,66 @@ function LabReportModal({ batch, onClose, onSubmit }) {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           onClick={(e) => e.stopPropagation()}
-          className="glass-card p-8 w-full max-w-sm text-center"
+          className="glass-card p-8 w-full max-w-md"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          >
-            <CheckCircle className="h-16 w-16 text-botanical-500 mx-auto mb-4" />
-          </motion.div>
-          <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">Report Submitted!</h2>
-          <p className="font-body text-sm text-gray-500 mb-4">
-            Batch #{batch.id} — {batch.herb_name} has been verified
-          </p>
-          {!result.weightMatch && (
-            <div className="flex items-center justify-center gap-2 text-amber-600 bg-amber-50 px-4 py-2 rounded-xl text-sm font-body font-medium">
-              <AlertTriangle className="h-4 w-4" />
-              Weight mismatch detected
+          {/* Icon + Title */}
+          <div className="text-center mb-6">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <CheckCircle className="h-14 w-14 text-botanical-500 mx-auto mb-3" />
+            </motion.div>
+            <h2 className="font-display text-2xl font-bold text-gray-900">Report Submitted!</h2>
+            <p className="font-body text-sm text-gray-400 mt-1">
+              Batch #{batch.id} — {batch.herb_name}
+            </p>
+          </div>
+
+          {/* Result Summary Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Overall Status */}
+            <div className={`rounded-xl p-3 text-center font-body text-sm font-semibold col-span-2 ${statusColor}`}>
+              Overall Status: {overallLabel}
+            </div>
+
+            {/* Score */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <span className="block text-xs text-gray-400 uppercase tracking-wider mb-0.5">Trust Score</span>
+              <span className="font-bold text-gray-800">{result.trust_score ?? batch.trust_score ?? '—'}%</span>
+            </div>
+
+            {/* Purity */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <span className="block text-xs text-gray-400 uppercase tracking-wider mb-0.5">Purity</span>
+              <span className="font-bold text-gray-800">{result.purity_percentage ?? formData.purity_percentage}%</span>
+            </div>
+
+            {/* Location */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <span className="block text-xs text-gray-400 uppercase tracking-wider mb-0.5">Location</span>
+              <span className="font-semibold text-gray-800 text-xs">{result.gps_place_name ?? batch.gps_place_name ?? '—'}</span>
+            </div>
+
+            {/* Season */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <span className="block text-xs text-gray-400 uppercase tracking-wider mb-0.5">Season</span>
+              <span className="font-semibold text-gray-800 text-xs">{result.season ?? batch.season ?? 'Spring 2025'}</span>
+            </div>
+          </div>
+
+          {/* Weight mismatch alert (snake_case from API/fallback) */}
+          {!result.weight_match && (
+            <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-4 py-2.5 rounded-xl text-sm font-body font-medium mb-4">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+              Weight mismatch — difference of {result.weight_difference ?? '?'} kg
             </div>
           )}
+
+          <button onClick={onClose} className="btn-secondary w-full text-sm">
+            Close
+          </button>
         </motion.div>
       </div>
     );

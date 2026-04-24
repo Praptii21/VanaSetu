@@ -209,6 +209,12 @@ function CreateProductModal({ selectedBatches, onClose, onCreate, onSuccess }) {
 
     const product = await onCreate(formData, selectedBatches.map((b) => b.id));
 
+    if (!product) {
+      alert('Failed to create product. Please try again.');
+      setSubmitting(false);
+      return;
+    }
+
     // QR encodes the consumer page URL — scanning opens the traceability view
     const consumerUrl = window.location.origin + '/product/' + product.id;
 

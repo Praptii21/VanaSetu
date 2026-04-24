@@ -59,7 +59,7 @@ def _generate_qr_base64(product_id: int) -> str:
 @router.get("/batches/lab-verified")
 def get_lab_verified_batches(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("manufacturer"))
+    current_user: User = Depends(require_role("manufacturer", "lab"))
 ):
     batches = db.query(Batch).filter(Batch.status == "lab_verified").order_by(Batch.created_at.desc()).all()
     result = []
@@ -75,7 +75,7 @@ def get_lab_verified_batches(
 def create_product(
     body: ProductCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("manufacturer"))
+    current_user: User = Depends(require_role("manufacturer", "lab"))
 ):
     batches = db.query(Batch).filter(Batch.id.in_(body.batch_ids)).all()
     if not batches:
@@ -102,8 +102,10 @@ def create_product(
     db.add(product)
     db.flush()  # assigns product.id without committing
 
-    qr_base64 = _generate_qr_base64(product.id)
-    product.qr_data = qr_base64
+    # Store just the consumer URL — the frontend generates the actual QR image
+    # client-side via canvas which is much faster than server-side PIL rendering.
+    consumer_url = f"https://vanasetu.app/product/{product.id}"
+    product.qr_data = consumer_url
 
     # Move batches to "with_manufacturer"
     for b in batches:
@@ -124,7 +126,7 @@ def create_product(
         "id": product.id,
         "product_name": product.product_name,
         "trust_score": product.trust_score,
-        "qr_data": qr_base64,
+        "qr_data": consumer_url,
         "product_hash": product_hash,
         "manufacturing_date": product.manufacturing_date,
         "expiry_date": product.expiry_date,
@@ -142,7 +144,7 @@ def create_product(
 @router.get("/manufacturer/products")
 def get_my_products(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("manufacturer"))
+    current_user: User = Depends(require_role("manufacturer", "lab"))
 ):
     products = db.query(Product).order_by(Product.created_at.desc()).all()
     return {"success": True, "data": products}
@@ -152,7 +154,7 @@ def get_my_products(
 def download_manufacturing_pdf(
     product_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("manufacturer"))
+    current_user: User = Depends(require_role("manufacturer", "lab"))
 ):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
