@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useMockData } from '../context/MockDataContext';
 import { generatePDF } from '../utils/pdfGenerator';
+import JourneyMap from '../components/JourneyMap';
 
 export default function ConsumerScan() {
   const { productId } = useParams();
@@ -159,6 +160,24 @@ export default function ConsumerScan() {
         </div>
 
         <div className="space-y-6 mt-6">
+          {/* ── Journey Map ────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="h-4 w-4 text-botanical-500" />
+              <h3 className="font-display text-lg font-bold text-gray-800">Supply Chain Route</h3>
+            </div>
+            <p className="font-body text-xs text-gray-400 mb-3">
+              Live route from collection points through lab testing to manufacturing
+            </p>
+            <JourneyMap product={product} />
+          </motion.div>
+
+          {/* ── Ingredient Cards ─────────────────── */}
           {product.ingredients.map((ingredient, idx) => (
             <motion.div
               key={ingredient.id}

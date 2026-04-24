@@ -397,11 +397,12 @@ export function MockDataProvider({ children }) {
   const getProduct = useCallback(async (productId) => {
     try {
       const res = await api.get(`/product/${productId}`);
-      return res.data.success ? res.data.data : null;
+      if (res.data.success) return res.data.data;
     } catch (err) {
-      return null;
+      // Fallback to local state if API fails
     }
-  }, []);
+    return products.find((p) => String(p.id) === String(productId)) || null;
+  }, [products]);
 
   return (
     <DataContext.Provider
