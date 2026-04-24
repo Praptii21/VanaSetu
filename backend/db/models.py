@@ -3,6 +3,16 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False)  # collector | lab | manufacturer
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class Batch(Base):
     __tablename__ = "batches"
 
@@ -34,6 +44,7 @@ class LabReport(Base):
     weight_match = Column(Boolean)
     overall_status = Column(String) # pass, fail
     report_hash = Column(String)
+    tested_by = Column(String, nullable=True)
     time_tested = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
 
