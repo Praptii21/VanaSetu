@@ -92,7 +92,7 @@ export default function LabPortal() {
                     weight: 'bg-orange-100 text-orange-700',
                     score: 'bg-purple-100 text-purple-700',
                     location: 'bg-blue-100 text-blue-700',
-                    seasonal: 'bg-teal-100 text-teal-700',
+                    
                   };
                   const fraudAlerts = batch.fraud_alerts || [];
                   const level = batch.alert_level || 'GREEN';
@@ -148,7 +148,7 @@ export default function LabPortal() {
                                   {alert.type === 'weight' && '⚖️ Weight'}
                                   {alert.type === 'score' && '📉 Score'}
                                   {alert.type === 'location' && '📍 Location'}
-                                  {alert.type === 'seasonal' && '🍂 Season'}
+                                  
                                 </span>
                               ))}
                             </div>
@@ -190,8 +190,8 @@ export default function LabPortal() {
 // ── Lab Report Modal Component ───────────────────────────
 function LabReportModal({ batch, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
-    ph_level: 7.0,
-    purity_percentage: 95.0,
+    ph_level: parseFloat((6.5 + Math.random() * 1.5).toFixed(1)),
+    purity_percentage: parseFloat((90 + Math.random() * 8).toFixed(1)),
     heavy_metals_pass: true,
     contamination_pass: true,
     weight_verified_kg: batch.weight_kg,
@@ -283,11 +283,7 @@ function LabReportModal({ batch, onClose, onSubmit }) {
               <span className="font-semibold text-gray-800 text-xs">{result.gps_place_name ?? batch.gps_place_name ?? '—'}</span>
             </div>
 
-            {/* Season */}
-            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-              <span className="block text-xs text-gray-400 uppercase tracking-wider mb-0.5">Season</span>
-              <span className="font-semibold text-gray-800 text-xs">{result.season ?? batch.season ?? 'Spring 2025'}</span>
-            </div>
+            
           </div>
 
           {/* Weight mismatch alert (snake_case from API/fallback) */}

@@ -273,7 +273,7 @@ export default function ConsumerScan() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-body text-sm">
             <div>
               <p className="text-botanical-300 text-xs mb-1">Total Input</p>
-              <p className="font-bold text-lg">{product.total_input_weight} kg</p>
+              <p className="font-bold text-lg">{Number(product.total_input_weight).toFixed(2)} kg</p>
             </div>
             <div>
               <p className="text-botanical-300 text-xs mb-1">Output</p>

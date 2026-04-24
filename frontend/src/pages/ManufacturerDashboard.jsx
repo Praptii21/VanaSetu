@@ -400,7 +400,7 @@ function CreateProductModal({ selectedBatches, onClose, onCreate, onSuccess }) {
             <div className="flex items-center justify-between font-body text-sm">
               <span className="text-gray-500 font-medium">Total Input Weight</span>
               <span className="text-lg font-bold text-gray-900">
-                {totalInputWeight.toFixed(1)} kg
+                {totalInputWeight.toFixed(2)} kg
               </span>
             </div>
             <p className="font-body text-xs text-gray-400 mt-0.5">Auto-calculated from selected batches</p>

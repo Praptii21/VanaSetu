@@ -29,18 +29,17 @@ export function MockDataProvider({ children }) {
   const [pendingBatches, setPendingBatches] = useState([
     {
       id: 101,
-      herb_name: 'Ashwagandha',
+      herb_name: 'Neem',
       collector_name: 'Rahul Sharma',
-      weight_kg: 12.5,
-      gps_lat: 28.6139,
-      gps_lng: 77.2090,
-      gps_place_name: 'Rishikesh, Uttarakhand',
+      weight_kg: 20,
+      gps_lat: 12.9716,
+      gps_lng: 77.5946,
+      gps_place_name: 'Bangalore, Karnataka',
       ai_confidence: 94,
       time_of_collection: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
       status: 'pending',
       trust_score: 88,
       alert_level: 'GREEN',
-      season: 'Winter 2025',
       fraud_alerts: [],
     },
     {
@@ -124,7 +123,7 @@ export function MockDataProvider({ children }) {
       trust_score: 79,
       alert_level: 'YELLOW',
       season: 'Winter 2025',
-      fraud_alerts: [{ type: 'seasonal', reason: 'Mulethi unusual for this season' }],
+      fraud_alerts: [],
     },
     // ─── FRAUD-FLAGGED BATCHES ──────────────────────────────
     {
@@ -162,7 +161,7 @@ export function MockDataProvider({ children }) {
       alert_level: 'RED',
       season: 'Spring 2025',
       fraud_alerts: [
-        { type: 'seasonal', reason: 'Sarpagandha harvested outside monsoon — quality suspect' },
+        
         { type: 'score', reason: 'Low AI confidence (58%) — possible misidentification' },
       ],
     },
@@ -347,7 +346,7 @@ export function MockDataProvider({ children }) {
           herb_name: batch.herb_name,
           gps_place_name: batch.gps_place_name,
           trust_score: batch.trust_score,
-          season: batch.season || 'Spring 2025',
+          
           purity_percentage: reportData.purity_percentage,
           overall_status: reportData.overall_status,
         };
@@ -397,11 +396,27 @@ export function MockDataProvider({ children }) {
   const getProduct = useCallback(async (productId) => {
     try {
       const res = await api.get(`/product/${productId}`);
-      if (res.data.success) return res.data.data;
+      if (res.data.success) {
+        return {
+          ...res.data.data,
+          lab_location: res.data.data.lab_location || { lat: 13.0827, lng: 80.2707, name: 'Chennai, Tamil Nadu' },
+          manufacturer_location: res.data.data.manufacturer_location || { lat: 13.6288, lng: 79.4192, name: 'Tirupati, Andhra Pradesh' },
+          destination_location: res.data.data.destination_location || { lat: 12.9716, lng: 77.5946, name: 'Bengaluru, Karnataka' }
+        };
+      }
     } catch (err) {
       // Fallback to local state if API fails
     }
-    return products.find((p) => String(p.id) === String(productId)) || null;
+    const found = products.find((p) => String(p.id) === String(productId));
+    if (found) {
+        return {
+          ...found,
+          lab_location: found.lab_location || { lat: 13.0827, lng: 80.2707, name: 'Chennai, Tamil Nadu' },
+          manufacturer_location: found.manufacturer_location || { lat: 13.6288, lng: 79.4192, name: 'Tirupati, Andhra Pradesh' },
+          destination_location: found.destination_location || { lat: 12.9716, lng: 77.5946, name: 'Bengaluru, Karnataka' }
+        };
+    }
+    return null;
   }, [products]);
 
   return (
