@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://192.168.137.196:8000") // Connect to backend on the local network
+            .baseUrl("https://c776-103-40-80-2.ngrok-free.app ") // Connect to backend on the local network
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         apiService = retrofit.create(ApiService::class.java)
