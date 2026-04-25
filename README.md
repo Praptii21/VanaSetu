@@ -25,6 +25,18 @@ At the heart of VanaSetu is a sophisticated security architecture that prevents 
 
 ---
 
+<img width="1173" height="828" alt="image" src="https://github.com/user-attachments/assets/0ddf74e7-a4af-4342-860a-87a314999575" />
+<img width="1613" height="829" alt="image" src="https://github.com/user-attachments/assets/2278cea7-8dda-40e6-bf7b-1113443881ec" />
+*   **LAB REPORT**
+
+<img width="719" height="741" alt="image" src="https://github.com/user-attachments/assets/f61ebb40-a21b-4b29-a7e6-c3f49d3c92ce" />
+
+<img width="460" height="817" alt="image" src="https://github.com/user-attachments/assets/2e109d88-bb7b-4c9c-bf21-f6c420a3dd1b" />
+
+--
+
+
+
 ## 📱 Project Components
 
 | Component | Technology | Role |
